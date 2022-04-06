@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:core';
+import 'package:desktop_window/desktop_window.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +32,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late List<TimeZoneData> times;
-
   TimeZoneData? current;
 
   @override
@@ -40,14 +41,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
     int now = DateTime.now().hour;
     current = times.firstWhere((element) => element.time == now);
+    DesktopWindow.setWindowSize(const Size(460, 780));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(children: <Widget>[buildDataTable(context)])));
+      body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(children: <Widget>[buildDataTable(context)])),
+    );
   }
 
   onTap(TimeZoneData timeZoneData) {
@@ -62,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget buildDataTable(BuildContext context) {
     return DataTable(
+        border: TableBorder.all(width: 1.0, color: Colors.black),
         dataRowHeight: 28.0,
         showCheckboxColumn: false,
         columns: const <DataColumn>[
@@ -107,7 +111,15 @@ class TimeZoneData {
   TimeZoneData(this.time);
 
   String toBsAs() => (time).toString().padLeft(2, '0') + ':00';
-  String toGMT() => (time + 3).toString().padLeft(2, '0');
-  String toPorto() => (time + 4).toString().padLeft(2, '0');
-  String toRome() => (time + 5).toString().padLeft(2, '0');
+  String toGMT() => plus(3).toString().padLeft(2, '0') + ':00';
+  String toPorto() => plus(4).toString().padLeft(2, '0') + ':00';
+  String toRome() => plus(5).toString().padLeft(2, '0') + ':00';
+
+  int plus(int diff) {
+    int val = time + diff;
+    if (val > 23) {
+      val -= 24;
+    }
+    return val;
+  }
 }
