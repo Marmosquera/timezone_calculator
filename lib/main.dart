@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:core';
 import 'package:desktop_window/desktop_window.dart';
+import 'package:flutter_window_close/flutter_window_close.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,6 +36,8 @@ class _MyHomePageState extends State<MyHomePage> {
   late List<TimeZoneData> times;
   TimeZoneData? current;
 
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   void initState() {
     super.initState();
@@ -41,7 +45,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
     int now = DateTime.now().hour;
     current = times.firstWhere((element) => element.time == now);
-    DesktopWindow.setWindowSize(const Size(460, 780));
+
+    _prefs.then((SharedPreferences prefs) async {
+      double w = prefs.getDouble('width') ?? 460;
+      double h = prefs.getDouble('height') ?? 780;
+      await DesktopWindow.setWindowSize(Size(w, h));
+    });
+
+    FlutterWindowClose.setWindowShouldCloseHandler(() async {
+      final Size size = await DesktopWindow.getWindowSize();
+      final SharedPreferences prefs = await _prefs;
+
+      prefs.setDouble('width', size.width);
+      prefs.setDouble('height', size.height);
+
+      return true;
+    });
   }
 
   @override
