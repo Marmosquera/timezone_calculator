@@ -126,13 +126,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class TimeZoneData {
   int time;
+  int isSummer = 0;
 
   TimeZoneData(this.time);
 
   String toBsAs() => (time).toString().padLeft(2, '0') + ':00';
   String toGMT() => plus(3).toString().padLeft(2, '0') + ':00';
-  String toPorto() => plus(4).toString().padLeft(2, '0') + ':00';
-  String toRome() => plus(5).toString().padLeft(2, '0') + ':00';
+  String toPorto() => plus(3 + isSummer).toString().padLeft(2, '0') + ':00';
+  String toRome() => plus(4 + isSummer).toString().padLeft(2, '0') + ':00';
 
   int plus(int diff) {
     int val = time + diff;
